@@ -466,6 +466,8 @@ nav.scrolled {
 }
 .scope-col.in .badge { background: rgba(13,148,136,0.12); color: var(--teal-deep); }
 .scope-col.out .badge { background: var(--cloud); color: var(--slate); }
+.scope-col.out .badge.post-mvp { background: rgba(124,106,239,0.1); color: var(--violet); }
+.scope-list .icon.future { color: var(--violet); }
 .scope-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
 .scope-list li { display: flex; align-items: flex-start; gap: 0.7rem; font-size: 0.86rem; line-height: 1.5; }
 .scope-col.in .scope-list li { color: var(--charcoal); }
@@ -749,7 +751,7 @@ nav.scrolled {
     <div class="section-title reveal reveal-delay-1">End-to-End Pipeline</div>
     <div class="section-subtitle reveal reveal-delay-2">From client files to analytics — fully automated, fully traceable.</div>
     <div class="pipeline-flow">
-      <div class="pipeline-step reveal reveal-delay-1"><div class="step-num">STEP 01</div><div class="step-icon">📂</div><h3>File Ingestion</h3><p>Ingest .xlsx / .xlsm files from the designated client directory</p></div>
+      <div class="pipeline-step reveal reveal-delay-1"><div class="step-num">STEP 01</div><div class="step-icon">🔍</div><h3>File Discovery</h3><p>Scan consultant directories on the UK server to locate .xlsx / .xlsm cost assessment files</p></div>
       <div class="pipeline-step reveal reveal-delay-2"><div class="step-num">STEP 02</div><div class="step-icon">✓</div><h3>Compliance Check</h3><p>Validate company number, single fiscal year, and version number</p></div>
       <div class="pipeline-step reveal reveal-delay-3"><div class="step-num">STEP 03</div><div class="step-icon">⛏</div><h3>Data Extraction</h3><p>Extract from Control, Benefit, Revised Comp, and NEST tabs</p></div>
       <div class="pipeline-step reveal reveal-delay-4"><div class="step-num">STEP 04</div><div class="step-icon">🏛</div><h3>Enrichment</h3><p>Companies House: official name, SIC code, sector mapping</p></div>
@@ -779,15 +781,18 @@ nav.scrolled {
         </ul>
       </div>
       <div class="scope-col out reveal reveal-delay-4">
-        <div class="scope-header"><span class="badge">— OUT OF SCOPE — MVP</span></div>
+        <div class="scope-header"><span class="badge">— EXCLUDED — MVP</span></div>
         <ul class="scope-list">
           <li><span class="icon">–</span>Manual data correction or enrichment</li>
           <li><span class="icon">–</span>Ambiguous or non-deterministic files</li>
           <li><span class="icon">–</span>PDF or legacy .xls ingestion</li>
           <li><span class="icon">–</span>Full historical backfill of all legacy assessments</li>
           <li><span class="icon">–</span>Automated correction of structural inconsistencies</li>
-          <li><span class="icon">–</span>Expanded template support (post-MVP)</li>
-          <li><span class="icon">–</span>Automated data quality feedback loops (post-MVP)</li>
+        </ul>
+        <div class="scope-header" style="margin-top: 1.5rem;"><span class="badge post-mvp">◇ FUTURE — POST-MVP</span></div>
+        <ul class="scope-list">
+          <li><span class="icon future">◦</span>Expanded template support</li>
+          <li><span class="icon future">◦</span>Automated data quality feedback loops</li>
         </ul>
       </div>
     </div>
@@ -888,7 +893,7 @@ nav.scrolled {
   <div class="slide-inner">
     <div class="section-label reveal" style="justify-content: center;">Summary</div>
     <div class="closing-tagline reveal reveal-delay-1">One dashboard.<br><span class="accent">Three levels of insight.</span><br>Audit-ready exports.</div>
-    <div class="closing-sub reveal reveal-delay-2">Cost Assessment Analytics delivers standardised, automated, and fully traceable R&D cost assessment analysis — from file ingestion to decision-grade analytics.</div>
+    <div class="closing-sub reveal reveal-delay-2">Cost Assessment Analytics delivers standardised, automated, and fully traceable R&D cost assessment analysis — from file discovery to decision-grade analytics.</div>
     <div class="closing-pills reveal reveal-delay-3">
       <span class="pill">Deterministic Automation</span>
       <span class="pill">Full Traceability</span>
