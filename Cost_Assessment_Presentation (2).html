@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cost Assessment Analytics — Leyton UK</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1A1F2E;
+  --ink-soft: #2D3348;
+  --charcoal: #404963;
+  --slate: #5E6780;
+  --mist: #8B93A8;
+  --silver: #B8BFCF;
+  --cloud: #DFE3EC;
+  --pearl: #ECEEF4;
+  --snow: #F5F6FA;
+  --white: #FFFFFF;
+  --teal: #0D9488;
+  --teal-deep: #0F766E;
+  --teal-light: #14B8A6;
+  --teal-pale: #F0FDFA;
+  --teal-wash: #CCFBF1;
+  --coral: #EF6461;
+  --coral-pale: #FEF2F2;
+  --amber: #E5A527;
+  --amber-pale: #FFFBEB;
+  --violet: #7C6AEF;
+  --violet-pale: #F5F3FF;
+  --blue: #3B82F6;
+  --blue-pale: #EFF6FF;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --shadow-sm: 0 1px 3px rgba(26,31,46,0.04), 0 1px 2px rgba(26,31,46,0.03);
+  --shadow-md: 0 4px 16px rgba(26,31,46,0.06), 0 1px 3px rgba(26,31,46,0.04);
+  --shadow-lg: 0 12px 40px rgba(26,31,46,0.08), 0 4px 12px rgba(26,31,46,0.04);
+  --shadow-xl: 0 20px 60px rgba(26,31,46,0.1), 0 8px 20px rgba(26,31,46,0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== NAVIGATION ===== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0.9rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.4s;
+}
+nav.scrolled {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--cloud);
+  box-shadow: var(--shadow-sm);
+}
+.nav-brand {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+}
+.nav-brand span { color: var(--mist); font-weight: 400; }
+.nav-dots {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cloud);
+  border: none;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.nav-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--white);
+  padding: 4px 10px;
+  border-radius: 4px;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.nav-dot:hover::after { opacity: 1; }
+.nav-dot:hover { background: var(--teal); transform: scale(1.3); }
+.nav-dot.active { background: var(--teal); width: 22px; border-radius: 4px; }
+
+/* ===== SLIDES ===== */
+.slide {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 3rem;
+}
+.slide-inner {
+  max-width: 1180px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== ANIMATIONS ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(35px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+
+/* ===== SHARED TYPOGRAPHY ===== */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.section-label::before {
+  content: '';
+  width: 24px; height: 1.5px;
+  background: var(--teal);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 3.8vw, 3rem);
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+  color: var(--ink);
+}
+.section-subtitle {
+  font-size: 1.02rem;
+  font-weight: 400;
+  color: var(--slate);
+  line-height: 1.65;
+  max-width: 620px;
+}
+
+/* ===== SLIDE 1: HERO ===== */
+#hero { background: var(--white); }
+#hero .slide-inner { max-width: 1280px; }
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.hero-bg .orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: orbFloat 14s ease-in-out infinite;
+}
+.hero-bg .orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(13,148,136,0.08), transparent 70%);
+  top: -10%; right: -5%;
+}
+.hero-bg .orb-2 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(124,106,239,0.06), transparent 70%);
+  bottom: -5%; left: 10%;
+  animation-delay: -5s;
+}
+.hero-bg .grid-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(13,148,136,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,148,136,0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 60% 55% at 65% 45%, black, transparent);
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(25px, -18px) scale(1.04); }
+  66% { transform: translate(-18px, 12px) scale(0.96); }
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  align-items: center;
+  min-height: 80vh;
+}
+.hero-text h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5vw, 3.8rem);
+  line-height: 1.1;
+  margin-bottom: 1.3rem;
+  color: var(--ink);
+}
+.hero-text h1 .accent { color: var(--teal); }
+.hero-text p {
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--slate);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  max-width: 480px;
+}
+.hero-meta {
+  display: flex;
+  gap: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--cloud);
+}
+.hero-meta-item {
+  font-size: 0.75rem;
+  color: var(--mist);
+}
+.hero-meta-item strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--charcoal);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.hero-stat-card {
+  background: var(--white);
+  border: 1px solid var(--cloud);
+  border-radius: 12px;
+  padding: 1.15rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.4s, box-shadow 0.4s, border-color 0.4s;
+}
+.hero-stat-card:hover {
+  transform: translateX(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--teal-wash);
+}
+.stat-icon {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.stat-icon.mint { background: var(--teal-pale); }
+.stat-icon.coral { background: var(--coral-pale); }
+.stat-icon.amber { background: var(--amber-pale); }
+.stat-icon.violet { background: var(--violet-pale); }
+.stat-text h4 { font-size: 0.88rem; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+.stat-text p { font-size: 0.76rem; color: var(--mist); font-weight: 400; line-height: 1.4; }
+
+/* ===== SLIDE 2: PROBLEM ===== */
+#problem { background: var(--snow); }
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.15rem;
+  margin-top: 2.5rem;
+}
+.problem-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 1.75rem 2rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--cloud);
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.problem-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.problem-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.problem-card:nth-child(1)::before { background: var(--coral); }
+.problem-card:nth-child(2)::before { background: var(--amber); }
+.problem-card:nth-child(3)::before { background: var(--violet); }
+.problem-card:nth-child(4)::before { background: var(--blue); }
+
+.problem-card .card-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 0.9rem;
+}
+.problem-card:nth-child(1) .card-icon { background: var(--coral-pale); }
+.problem-card:nth-child(2) .card-icon { background: var(--amber-pale); }
+.problem-card:nth-child(3) .card-icon { background: var(--violet-pale); }
+.problem-card:nth-child(4) .card-icon { background: var(--blue-pale); }
+.problem-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.45rem; color: var(--ink); }
+.problem-card p { font-size: 0.85rem; color: var(--slate); line-height: 1.6; }
+
+/* ===== SLIDE 3: SOLUTION ===== */
+#solution { background: var(--white); }
+
+.solution-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.15rem;
+  margin-top: 2.5rem;
+}
+.solution-card {
+  background: var(--snow);
+  border: 1px solid var(--cloud);
+  border-radius: 14px;
+  padding: 1.75rem;
+  transition: transform 0.4s, box-shadow 0.4s, border-color 0.4s;
+}
+.solution-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--teal-wash); }
+.solution-card .card-num {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--teal);
+  letter-spacing: 1px;
+  margin-bottom: 0.9rem;
+  opacity: 0.7;
+}
+.solution-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--ink); }
+.solution-card p { font-size: 0.83rem; color: var(--slate); line-height: 1.6; }
+
+/* ===== SLIDE 4: PIPELINE ===== */
+#pipeline { background: var(--snow); }
+
+.pipeline-flow {
+  display: flex;
+  gap: 0;
+  margin-top: 2.5rem;
+}
+.pipeline-step {
+  flex: 1;
+  text-align: center;
+  padding: 1.75rem 1.15rem;
+  background: var(--white);
+  border: 1px solid var(--cloud);
+  position: relative;
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.pipeline-step:first-child { border-radius: 14px 0 0 14px; }
+.pipeline-step:last-child { border-radius: 0 14px 14px 0; }
+.pipeline-step:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); z-index: 2; }
+.pipeline-step::after {
+  content: '→';
+  position: absolute;
+  right: -8px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: var(--teal);
+  z-index: 3;
+  font-weight: 700;
+}
+.pipeline-step:last-child::after { display: none; }
+.step-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--teal); letter-spacing: 1px; margin-bottom: 0.7rem; }
+.step-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--teal-pale);
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin: 0 auto 0.85rem;
+}
+.pipeline-step h3 { font-size: 0.88rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
+.pipeline-step p { font-size: 0.76rem; color: var(--slate); line-height: 1.5; }
+
+.pipeline-note {
+  margin-top: 1.5rem;
+  background: var(--amber-pale);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 10px 10px 0;
+  padding: 0.9rem 1.4rem;
+  font-size: 0.83rem;
+  color: var(--charcoal);
+  line-height: 1.55;
+}
+
+/* ===== SLIDE 5: SCOPE ===== */
+#scope { background: var(--white); }
+
+.scope-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+.scope-col { border-radius: 16px; padding: 2rem; overflow: hidden; }
+.scope-col.in { background: var(--teal-pale); border: 1px solid var(--teal-wash); }
+.scope-col.out { background: var(--snow); border: 1px solid var(--cloud); }
+.scope-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+.scope-col.in .scope-header { border-bottom: 1px solid rgba(13,148,136,0.12); }
+.scope-col.out .scope-header { border-bottom: 1px solid var(--cloud); }
+.scope-header .badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.scope-col.in .badge { background: rgba(13,148,136,0.12); color: var(--teal-deep); }
+.scope-col.out .badge { background: var(--cloud); color: var(--slate); }
+.scope-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+.scope-list li { display: flex; align-items: flex-start; gap: 0.7rem; font-size: 0.86rem; line-height: 1.5; }
+.scope-col.in .scope-list li { color: var(--charcoal); }
+.scope-col.out .scope-list li { color: var(--slate); }
+.scope-list .icon { flex-shrink: 0; margin-top: 1px; font-size: 0.85rem; }
+.scope-col.in .icon { color: var(--teal); }
+.scope-col.out .icon { color: var(--silver); }
+
+/* ===== SLIDE 6: DASHBOARD ===== */
+#dashboard { background: var(--snow); }
+
+.dash-levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+.dash-card {
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--cloud);
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.dash-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
+.dash-card-header { padding: 1.6rem 1.6rem 1.2rem; border-bottom: 1px solid var(--pearl); }
+.dash-card-header .level-badge {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 0.65rem;
+}
+.dash-card:nth-child(1) .level-badge { background: var(--teal-pale); color: var(--teal-deep); }
+.dash-card:nth-child(2) .level-badge { background: var(--violet-pale); color: var(--violet); }
+.dash-card:nth-child(3) .level-badge { background: var(--blue-pale); color: var(--blue); }
+.dash-card-header h3 { font-family: var(--font-display); font-size: 1.3rem; color: var(--ink); margin-bottom: 0.35rem; }
+.dash-card-header p { font-size: 0.8rem; color: var(--slate); line-height: 1.5; }
+.dash-card-body { padding: 1.15rem 1.6rem 1.5rem; }
+.dash-metric-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.dash-metric-list li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.8rem; color: var(--charcoal); line-height: 1.45; }
+.dash-metric-list .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.dash-card:nth-child(1) .dot { background: var(--teal); }
+.dash-card:nth-child(2) .dot { background: var(--violet); }
+.dash-card:nth-child(3) .dot { background: var(--blue); }
+.dash-card-footer { padding: 0 1.6rem 1.4rem; }
+.dash-note { background: var(--snow); border-radius: 8px; padding: 0.65rem 0.9rem; font-size: 0.72rem; color: var(--slate); line-height: 1.5; font-style: italic; }
+
+/* ===== SLIDE 8: EXPORTS ===== */
+#exports { background: var(--snow); }
+
+.exports-main { margin-top: 2.5rem; }
+.export-hero-card {
+  background: var(--white);
+  border: 1px solid var(--cloud);
+  border-radius: 16px;
+  padding: 2rem 2.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+.export-hero-icon {
+  width: 58px; height: 58px;
+  border-radius: 14px;
+  background: var(--teal-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.export-hero-text h3 { font-size: 1.1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.3rem; }
+.export-hero-text p { font-size: 0.88rem; color: var(--slate); line-height: 1.55; }
+
+.export-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
+.export-card {
+  background: var(--white);
+  border: 1px solid var(--cloud);
+  border-radius: 14px;
+  padding: 1.6rem;
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.export-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.export-card .ec-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  margin-bottom: 0.85rem;
+}
+.export-card:nth-child(1) .ec-icon { background: var(--teal-pale); }
+.export-card:nth-child(2) .ec-icon { background: var(--violet-pale); }
+.export-card:nth-child(3) .ec-icon { background: var(--amber-pale); }
+.export-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--ink); margin-bottom: 0.35rem; }
+.export-card p { font-size: 0.8rem; color: var(--slate); line-height: 1.55; }
+
+/* ===== SLIDE 9: GOVERNANCE ===== */
+#governance { background: var(--white); }
+
+.gov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; margin-top: 2.5rem; }
+.gov-card {
+  padding: 1.6rem;
+  border-radius: 14px;
+  border: 1px solid var(--cloud);
+  background: var(--snow);
+  transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+}
+.gov-card:hover { border-color: var(--teal-wash); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.gov-card .gov-icon { font-size: 1.3rem; margin-bottom: 0.85rem; }
+.gov-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
+.gov-card p { font-size: 0.8rem; color: var(--slate); line-height: 1.6; }
+
+/* ===== SLIDE 10: USERS ===== */
+#users { background: var(--snow); }
+
+.users-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.15rem; margin-top: 2.5rem; }
+.user-card {
+  background: var(--white);
+  border: 1px solid var(--cloud);
+  border-radius: 14px;
+  padding: 1.6rem 1.75rem;
+  display: flex;
+  gap: 1.15rem;
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.user-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.user-avatar {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+.user-card:nth-child(1) .user-avatar { background: var(--teal-pale); }
+.user-card:nth-child(2) .user-avatar { background: var(--violet-pale); }
+.user-card:nth-child(3) .user-avatar { background: var(--blue-pale); }
+.user-card:nth-child(4) .user-avatar { background: var(--amber-pale); }
+.user-card.secondary {
+  background: var(--snow);
+  border: 1px dashed var(--cloud);
+}
+.user-card.secondary .user-avatar { background: rgba(139,147,168,0.12) !important; }
+.user-card.secondary .role-tag { color: var(--mist) !important; }
+.user-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 0.2rem; }
+.user-info .role-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--teal); letter-spacing: 0.5px; margin-bottom: 0.45rem; }
+.user-info p { font-size: 0.8rem; color: var(--slate); line-height: 1.5; }
+
+/* ===== SLIDE 11: CLOSING ===== */
+#closing { background: var(--white); text-align: center; }
+#closing .slide-inner { max-width: 800px; }
+
+.closing-tagline {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4.2vw, 2.8rem);
+  line-height: 1.25;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+.closing-tagline .accent { color: var(--teal); }
+.closing-sub { font-size: 1.02rem; color: var(--slate); font-weight: 400; margin-bottom: 2.5rem; line-height: 1.65; }
+.closing-pills { display: flex; justify-content: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.pill {
+  background: var(--teal-pale);
+  border: 1px solid var(--teal-wash);
+  color: var(--teal-deep);
+  padding: 0.55rem 1.25rem;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.pill:hover { background: var(--teal-wash); box-shadow: var(--shadow-sm); }
+.closing-brand {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--silver);
+}
+.closing-brand span { color: var(--teal); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .slide { padding: 4rem 1.5rem; }
+  .hero-content { grid-template-columns: 1fr; gap: 2rem; }
+  .problem-grid, .dash-levels, .solution-grid, .gov-grid, .export-cards { grid-template-columns: 1fr; }
+  .scope-cols, .users-grid { grid-template-columns: 1fr; }
+  .pipeline-flow { flex-direction: column; }
+  .pipeline-step { border-radius: 14px !important; }
+  .pipeline-step::after { display: none; }
+  .hero-visual { display: none; }
+  .nav-dots { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-brand">LEYTON <span>| Business Intelligence</span></div>
+  <div class="nav-dots">
+    <button class="nav-dot active" data-slide="hero" data-label="Home"></button>
+    <button class="nav-dot" data-slide="problem" data-label="Problem"></button>
+    <button class="nav-dot" data-slide="solution" data-label="Solution"></button>
+    <button class="nav-dot" data-slide="pipeline" data-label="Pipeline"></button>
+    <button class="nav-dot" data-slide="scope" data-label="Scope"></button>
+    <button class="nav-dot" data-slide="dashboard" data-label="Dashboard"></button>
+    <button class="nav-dot" data-slide="exports" data-label="Exports"></button>
+    <button class="nav-dot" data-slide="governance" data-label="Governance"></button>
+    <button class="nav-dot" data-slide="users" data-label="Users"></button>
+    <button class="nav-dot" data-slide="closing" data-label="Summary"></button>
+  </div>
+</nav>
+
+<section class="slide" id="hero">
+  <div class="hero-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grid-lines"></div></div>
+  <div class="slide-inner">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="section-label reveal">Cost Assessment Analytics</div>
+        <h1 class="reveal reveal-delay-1">Industrialised<br><span class="accent">R&D Cost Assessment</span><br>Analytics</h1>
+        <p class="reveal reveal-delay-2">Standardise, automate, and scale the extraction and analysis of R&D Tax Cost Assessment data — delivering decision-grade analytics through a single, trusted dashboard.</p>
+        <div class="hero-meta reveal reveal-delay-3">
+          <div class="hero-meta-item"><strong>Product</strong>MVP Overview</div>
+          <div class="hero-meta-item"><strong>Team</strong>Data Factory</div>
+          <div class="hero-meta-item"><strong>Date</strong>February 2026</div>
+        </div>
+      </div>
+      <div class="hero-visual reveal reveal-delay-3">
+        <div class="hero-stat-card"><div class="stat-icon mint">📊</div><div class="stat-text"><h4>Single Trusted Dashboard</h4><p>Company, comparative & portfolio analytics in one place</p></div></div>
+        <div class="hero-stat-card"><div class="stat-icon coral">⚡</div><div class="stat-text"><h4>Deterministic Automation</h4><p>No guesswork — only compliant, verified data processed</p></div></div>
+        <div class="hero-stat-card"><div class="stat-icon amber">🔍</div><div class="stat-text"><h4>Full Traceability</h4><p>Clear lineage from source file to every dashboard metric</p></div></div>
+        <div class="hero-stat-card"><div class="stat-icon violet">📤</div><div class="stat-text"><h4>Audit-Ready Exports</h4><p>Excel & CSV exports that respect all applied filters</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="problem">
+  <div class="slide-inner">
+    <div class="section-label reveal">The Challenge</div>
+    <div class="section-title reveal reveal-delay-1">Why This Matters</div>
+    <div class="section-subtitle reveal reveal-delay-2">Current R&D cost assessment analysis is manual, inconsistent, and cannot scale with the business.</div>
+    <div class="problem-grid">
+      <div class="problem-card reveal reveal-delay-2"><div class="card-icon">⏱</div><h3>Slow Turnaround</h3><p>Heavy manual processing of Excel-based client deliverables creates bottlenecks, delays turnaround times, and limits the team's capacity to take on more work.</p></div>
+      <div class="problem-card reveal reveal-delay-3"><div class="card-icon">⚠️</div><h3>Inconsistent Templates</h3><p>Inconsistent Excel templates and unreliable file naming conventions make it difficult to reliably identify companies and match data across claims.</p></div>
+      <div class="problem-card reveal reveal-delay-4"><div class="card-icon">🔄</div><h3>Double Counting Risk</h3><p>No reliable deduplication or version control — multiple versions of the same claim create high risk of misattribution and double counting.</p></div>
+      <div class="problem-card reveal reveal-delay-5"><div class="card-icon">📉</div><h3>Limited Portfolio Visibility</h3><p>No portfolio-level analytics means management lacks strategic insight across the full book of business, limiting decision confidence.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="solution">
+  <div class="slide-inner">
+    <div class="section-label reveal">The Product</div>
+    <div class="section-title reveal reveal-delay-1">What Cost Assessment Delivers</div>
+    <div class="section-subtitle reveal reveal-delay-2">Deterministic automation prioritising data correctness, traceability, and decision-grade analytics.</div>
+    <div class="solution-grid">
+      <div class="solution-card reveal reveal-delay-2"><div class="card-num">01</div><h3>Automated Extraction</h3><p>Deterministic automation of compliant R&D cost assessment files. Only files meeting strict compliance rules are processed — no manual intervention.</p></div>
+      <div class="solution-card reveal reveal-delay-3"><div class="card-num">02</div><h3>Reliable Identification</h3><p>Companies identified via registration number extracted from file content — never from file names or folder paths.</p></div>
+      <div class="solution-card reveal reveal-delay-4"><div class="card-num">03</div><h3>Normalised Data</h3><p>Cost and benefit data normalised across all claims for consistent, comparable analytics — enabling true like-for-like analysis.</p></div>
+      <div class="solution-card reveal reveal-delay-2"><div class="card-num">04</div><h3>Smart Versioning</h3><p>Automatic version resolution: highest version number always wins. Equal versions resolved by most recent timestamp. No silent overwrites.</p></div>
+      <div class="solution-card reveal reveal-delay-3"><div class="card-num">05</div><h3>Companies House Enrichment</h3><p>Data enriched with official company name, country, SIC code, and standardised sector categories from the Companies House index.</p></div>
+      <div class="solution-card reveal reveal-delay-4"><div class="card-num">06</div><h3>Trusted Power BI Dashboard</h3><p>Single dashboard delivering company-level, comparative, and portfolio analytics with filter-aware Excel and CSV exports.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="pipeline">
+  <div class="slide-inner">
+    <div class="section-label reveal">How It Works</div>
+    <div class="section-title reveal reveal-delay-1">End-to-End Pipeline</div>
+    <div class="section-subtitle reveal reveal-delay-2">From client files to analytics — fully automated, fully traceable.</div>
+    <div class="pipeline-flow">
+      <div class="pipeline-step reveal reveal-delay-1"><div class="step-num">STEP 01</div><div class="step-icon">📂</div><h3>File Ingestion</h3><p>Ingest .xlsx / .xlsm files from the designated client directory</p></div>
+      <div class="pipeline-step reveal reveal-delay-2"><div class="step-num">STEP 02</div><div class="step-icon">✓</div><h3>Compliance Check</h3><p>Validate company number, single fiscal year, and version number</p></div>
+      <div class="pipeline-step reveal reveal-delay-3"><div class="step-num">STEP 03</div><div class="step-icon">⛏</div><h3>Data Extraction</h3><p>Extract from Control, Benefit, Revised Comp, and NEST tabs</p></div>
+      <div class="pipeline-step reveal reveal-delay-4"><div class="step-num">STEP 04</div><div class="step-icon">🏛</div><h3>Enrichment</h3><p>Companies House: official name, SIC code, sector mapping</p></div>
+      <div class="pipeline-step reveal reveal-delay-5"><div class="step-num">STEP 05</div><div class="step-icon">📊</div><h3>Dashboard</h3><p>Power BI analytics at three levels with audit-ready exports</p></div>
+    </div>
+    <div class="pipeline-note reveal reveal-delay-6">⚠️ Non-compliant files (missing company number, ambiguous years, structural issues) are explicitly logged and excluded — never silently dropped or overwritten.</div>
+  </div>
+</section>
+
+<section class="slide" id="scope">
+  <div class="slide-inner">
+    <div class="section-label reveal">MVP Boundaries</div>
+    <div class="section-title reveal reveal-delay-1">What's In & Out of Scope</div>
+    <div class="section-subtitle reveal reveal-delay-2">Clear boundaries ensure we deliver reliability first, then expand coverage.</div>
+    <div class="scope-cols">
+      <div class="scope-col in reveal reveal-delay-3">
+        <div class="scope-header"><span class="badge">✦ IN SCOPE — MVP</span></div>
+        <ul class="scope-list">
+          <li><span class="icon">✓</span>Automated extraction of compliant .xlsx / .xlsm files</li>
+          <li><span class="icon">✓</span>Company identification via registration number</li>
+          <li><span class="icon">✓</span>Normalised cost & benefit data across claims</li>
+          <li><span class="icon">✓</span>Company, comparative & portfolio analytics</li>
+          <li><span class="icon">✓</span>Single trusted Power BI dashboard</li>
+          <li><span class="icon">✓</span>Claim-level data exports in Excel & CSV</li>
+          <li><span class="icon">✓</span>Companies House enrichment (name, SIC, sector)</li>
+          <li><span class="icon">✓</span>Smart version selection (highest version + timestamp)</li>
+        </ul>
+      </div>
+      <div class="scope-col out reveal reveal-delay-4">
+        <div class="scope-header"><span class="badge">— OUT OF SCOPE — MVP</span></div>
+        <ul class="scope-list">
+          <li><span class="icon">–</span>Manual data correction or enrichment</li>
+          <li><span class="icon">–</span>Ambiguous or non-deterministic files</li>
+          <li><span class="icon">–</span>PDF or legacy .xls ingestion</li>
+          <li><span class="icon">–</span>Full historical backfill of all legacy assessments</li>
+          <li><span class="icon">–</span>Automated correction of structural inconsistencies</li>
+          <li><span class="icon">–</span>Expanded template support (post-MVP)</li>
+          <li><span class="icon">–</span>Automated data quality feedback loops (post-MVP)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="dashboard">
+  <div class="slide-inner">
+    <div class="section-label reveal">Primary Output</div>
+    <div class="section-title reveal reveal-delay-1">The Dashboard — Three Levels of Insight</div>
+    <div class="section-subtitle reveal reveal-delay-2">A single Power BI dashboard providing complete analytical coverage from individual claims to the full Leyton portfolio.</div>
+    <div class="dash-levels">
+      <div class="dash-card reveal reveal-delay-2">
+        <div class="dash-card-header"><div class="level-badge">LEVEL 1</div><h3>Single Company</h3><p>Deep-dive analytics on one company's R&D claims</p></div>
+        <div class="dash-card-body"><ul class="dash-metric-list">
+          <li><span class="dot"></span>YoY trends in Tax Benefit (% growth)</li>
+          <li><span class="dot"></span>YoY trends in Total Qualifying Expenditure (% growth)</li>
+          <li><span class="dot"></span>Percentage breakdown of all 8 cost categories</li>
+          <li><span class="dot"></span>YoY trends in cost category composition</li>
+          <li><span class="dot"></span>Project-level expenditure breakdown by fiscal year</li>
+          <li><span class="dot"></span>Multi-year projects split by year, not aggregated</li>
+        </ul></div>
+        <div class="dash-card-footer"><div class="dash-note">Default view: last fiscal year. Users can select any year for comparison.</div></div>
+      </div>
+      <div class="dash-card reveal reveal-delay-3">
+        <div class="dash-card-header"><div class="level-badge">LEVEL 2</div><h3>Comparative</h3><p>Side-by-side analysis across multiple companies</p></div>
+        <div class="dash-card-body"><ul class="dash-metric-list">
+          <li><span class="dot"></span>Same full metric set as single company view</li>
+          <li><span class="dot"></span>Up to 4 companies displayed side-by-side in dashboard</li>
+          <li><span class="dot"></span>Compare by SIC code, company size band, cost band, or region</li>
+          <li><span class="dot"></span>Benefit, expenditure & category YoY comparisons</li>
+          <li><span class="dot"></span>Project spend YoY across selected companies</li>
+        </ul></div>
+        <div class="dash-card-footer"><div class="dash-note">Exports: no limit — all claims for a period, sector, or matching criteria.</div></div>
+      </div>
+      <div class="dash-card reveal reveal-delay-4">
+        <div class="dash-card-header"><div class="level-badge">LEVEL 3</div><h3>Leyton Portfolio</h3><p>Full book-of-business strategic overview</p></div>
+        <div class="dash-card-body"><ul class="dash-metric-list">
+          <li><span class="dot"></span>Total Expenditure trend across the portfolio</li>
+          <li><span class="dot"></span>Total Tax Benefit trend across the portfolio</li>
+          <li><span class="dot"></span>Cost category trend across all claims</li>
+          <li><span class="dot"></span>YoY comparative portfolio trends</li>
+          <li><span class="dot"></span>Portfolio R&D intensity analysis</li>
+          <li><span class="dot"></span>Normalised averages (avg. claim amount)</li>
+        </ul></div>
+        <div class="dash-card-footer"><div class="dash-note">Two modes: total portfolio values and normalised averages.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="exports">
+  <div class="slide-inner">
+    <div class="section-label reveal">Outputs</div>
+    <div class="section-title reveal reveal-delay-1">Exports & Deliverables</div>
+    <div class="section-subtitle reveal reveal-delay-2">Export claim-level data per company directly from the dashboard — all exports respect applied filters.</div>
+    <div class="exports-main">
+      <div class="export-hero-card reveal reveal-delay-2"><div class="export-hero-icon">📊</div><div class="export-hero-text"><h3>Primary Output: Power BI Dashboard</h3><p>Interactive analytics across single company, comparative, and portfolio views. Read-only access for business users with controlled dataset access for data teams. Users can export claims per company in Excel or CSV directly from the dashboard.</p></div></div>
+      <div class="export-cards" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="export-card reveal reveal-delay-3"><div class="ec-icon">📑</div><h4>Excel Export</h4><p>Export all claims per company directly from the dashboard. Exports respect all applied filters — what you see is what you get.</p></div>
+        <div class="export-card reveal reveal-delay-4"><div class="ec-icon">📄</div><h4>CSV Export</h4><p>Lightweight claim-level data export per company for downstream analysis, integration with other tools, or offline review.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="governance">
+  <div class="slide-inner">
+    <div class="section-label reveal">Trust & Quality</div>
+    <div class="section-title reveal reveal-delay-1">Data Governance & Quality</div>
+    <div class="section-subtitle reveal reveal-delay-2">Every design decision prioritises correctness, traceability, and auditability.</div>
+    <div class="gov-grid">
+      <div class="gov-card reveal reveal-delay-2"><div class="gov-icon">📋</div><h4>Explicit Exclusions</h4><p>All non-compliant files are logged with clear reasons. Nothing is silently dropped or overwritten — every exclusion is traceable.</p></div>
+      <div class="gov-card reveal reveal-delay-3"><div class="gov-icon">🔗</div><h4>Full Lineage</h4><p>Clear data lineage from every source file through extraction, enrichment, and aggregation to the final dashboard metric.</p></div>
+      <div class="gov-card reveal reveal-delay-4"><div class="gov-icon">🎯</div><h4>Deterministic Only</h4><p>MVP processes only files meeting strict compliance rules — no guesswork, no probabilistic matching, no ambiguity.</p></div>
+      <div class="gov-card reveal reveal-delay-2"><div class="gov-icon">🔒</div><h4>Access Control</h4><p>Read-only dashboard access for business users. Controlled dataset access for data teams. Clear separation of concerns.</p></div>
+      <div class="gov-card reveal reveal-delay-3"><div class="gov-icon">📌</div><h4>Version Governance</h4><p>Highest version number always selected. Timestamp-based fallback for equal versions. No manual version resolution needed.</p></div>
+      <div class="gov-card reveal reveal-delay-4"><div class="gov-icon">🏛</div><h4>Authoritative Sources</h4><p>Companies House for enrichment. Registration numbers for identification. Content-driven extraction resilient to layout changes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="users">
+  <div class="slide-inner">
+    <div class="section-label reveal">Who It Serves</div>
+    <div class="section-title reveal reveal-delay-1">Stakeholders & Users</div>
+    <div class="section-subtitle reveal reveal-delay-2">Designed for multiple user profiles, from day-to-day claim analysis to strategic portfolio oversight.</div>
+    <div class="users-grid">
+      <div class="user-card reveal reveal-delay-2"><div class="user-avatar">👤</div><div class="user-info"><h4>Consultants</h4><div class="role-tag">PRIMARY USER</div><p>Claim-level analysis and company deep-dives to support client advisory work. Single company view is their primary workspace.</p></div></div>
+      <div class="user-card reveal reveal-delay-3"><div class="user-avatar">📈</div><div class="user-info"><h4>Business Analysts / Performance</h4><div class="role-tag">PRIMARY USER</div><p>Portfolio-level analysis, performance tracking, and trend identification across the book of business.</p></div></div>
+      <div class="user-card reveal reveal-delay-4"><div class="user-avatar">🏢</div><div class="user-info"><h4>Management</h4><div class="role-tag">PRIMARY USER</div><p>Strategic oversight with high-level trends, R&D intensity analysis, and portfolio health across all regions.</p></div></div>
+      <div class="user-card secondary reveal reveal-delay-5"><div class="user-avatar">⚙️</div><div class="user-info"><h4>Data Teams</h4><div class="role-tag">SECONDARY USER</div><p>Data quality monitoring, lineage validation, and pipeline health checks.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="closing">
+  <div class="slide-inner">
+    <div class="section-label reveal" style="justify-content: center;">Summary</div>
+    <div class="closing-tagline reveal reveal-delay-1">One dashboard.<br><span class="accent">Three levels of insight.</span><br>Audit-ready exports.</div>
+    <div class="closing-sub reveal reveal-delay-2">Cost Assessment Analytics delivers standardised, automated, and fully traceable R&D cost assessment analysis — from file ingestion to decision-grade analytics.</div>
+    <div class="closing-pills reveal reveal-delay-3">
+      <span class="pill">Deterministic Automation</span>
+      <span class="pill">Full Traceability</span>
+      <span class="pill">Power BI Dashboard</span>
+      <span class="pill">Excel & CSV Exports</span>
+      <span class="pill">Companies House Enrichment</span>
+    </div>
+    <div class="closing-brand reveal reveal-delay-4"><span>LEYTON</span> UK — Business Intelligence</div>
+  </div>
+</section>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.15, rootMargin: '-40px' });
+reveals.forEach(el => revealObserver.observe(el));
+
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 50); });
+
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.nav-dot');
+const slideObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      dots.forEach(d => d.classList.remove('active'));
+      const dot = document.querySelector(`.nav-dot[data-slide="${entry.target.id}"]`);
+      if (dot) dot.classList.add('active');
+    }
+  });
+}, { threshold: 0.4 });
+slides.forEach(s => slideObserver.observe(s));
+
+dots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    const target = document.getElementById(dot.dataset.slide);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  const currentIdx = [...slides].findIndex(s => {
+    const rect = s.getBoundingClientRect();
+    return rect.top >= -100 && rect.top < window.innerHeight / 2;
+  });
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); slides[Math.min(currentIdx + 1, slides.length - 1)]?.scrollIntoView({ behavior: 'smooth' }); }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); slides[Math.max(currentIdx - 1, 0)]?.scrollIntoView({ behavior: 'smooth' }); }
+});
+</script>
+</body>
+</html>
