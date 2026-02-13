@@ -571,22 +571,6 @@ nav.scrolled {
 .export-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--ink); margin-bottom: 0.35rem; }
 .export-card p { font-size: 0.8rem; color: var(--slate); line-height: 1.55; }
 
-/* ===== SLIDE 9: GOVERNANCE ===== */
-#governance { background: var(--white); }
-
-.gov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; margin-top: 2.5rem; }
-.gov-card {
-  padding: 1.6rem;
-  border-radius: 14px;
-  border: 1px solid var(--cloud);
-  background: var(--snow);
-  transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
-}
-.gov-card:hover { border-color: var(--teal-wash); transform: translateY(-3px); box-shadow: var(--shadow-md); }
-.gov-card .gov-icon { font-size: 1.3rem; margin-bottom: 0.85rem; }
-.gov-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
-.gov-card p { font-size: 0.8rem; color: var(--slate); line-height: 1.6; }
-
 /* ===== SLIDE 10: USERS ===== */
 #users { background: var(--snow); }
 
@@ -663,7 +647,7 @@ nav.scrolled {
 @media (max-width: 900px) {
   .slide { padding: 4rem 1.5rem; }
   .hero-content { grid-template-columns: 1fr; gap: 2rem; }
-  .problem-grid, .dash-levels, .solution-grid, .gov-grid, .export-cards { grid-template-columns: 1fr; }
+  .problem-grid, .dash-levels, .solution-grid, .export-cards { grid-template-columns: 1fr; }
   .scope-cols, .users-grid { grid-template-columns: 1fr; }
   .pipeline-flow { flex-direction: column; }
   .pipeline-step { border-radius: 14px !important; }
@@ -676,7 +660,7 @@ nav.scrolled {
 <body>
 
 <nav id="nav">
-  <div class="nav-brand">LEYTON <span>| Data Factory</span></div>
+  <div class="nav-brand">LEYTON <span>| Business Intelligence</span></div>
   <div class="nav-dots">
     <button class="nav-dot active" data-slide="hero" data-label="Home"></button>
     <button class="nav-dot" data-slide="problem" data-label="Problem"></button>
@@ -685,7 +669,6 @@ nav.scrolled {
     <button class="nav-dot" data-slide="scope" data-label="Scope"></button>
     <button class="nav-dot" data-slide="dashboard" data-label="Dashboard"></button>
     <button class="nav-dot" data-slide="exports" data-label="Exports"></button>
-    <button class="nav-dot" data-slide="governance" data-label="Governance"></button>
     <button class="nav-dot" data-slide="users" data-label="Users"></button>
     <button class="nav-dot" data-slide="closing" data-label="Summary"></button>
   </div>
@@ -859,21 +842,7 @@ nav.scrolled {
   </div>
 </section>
 
-<section class="slide" id="governance">
-  <div class="slide-inner">
-    <div class="section-label reveal">Trust & Quality</div>
-    <div class="section-title reveal reveal-delay-1">Data Governance & Quality</div>
-    <div class="section-subtitle reveal reveal-delay-2">Every design decision prioritises correctness, traceability, and auditability.</div>
-    <div class="gov-grid">
-      <div class="gov-card reveal reveal-delay-2"><div class="gov-icon">📋</div><h4>Explicit Exclusions</h4><p>All non-compliant files are logged with clear reasons. Nothing is silently dropped or overwritten — every exclusion is traceable.</p></div>
-      <div class="gov-card reveal reveal-delay-3"><div class="gov-icon">🔗</div><h4>Full Lineage</h4><p>Clear data lineage from every source file through extraction, enrichment, and aggregation to the final dashboard metric.</p></div>
-      <div class="gov-card reveal reveal-delay-4"><div class="gov-icon">🎯</div><h4>Deterministic Only</h4><p>MVP processes only files meeting strict compliance rules — no guesswork, no probabilistic matching, no ambiguity.</p></div>
-      <div class="gov-card reveal reveal-delay-2"><div class="gov-icon">🔒</div><h4>Access Control</h4><p>Read-only dashboard access for business users. Controlled dataset access for data teams. Clear separation of concerns.</p></div>
-      <div class="gov-card reveal reveal-delay-3"><div class="gov-icon">📌</div><h4>Version Governance</h4><p>Highest version number always selected. Timestamp-based fallback for equal versions. No manual version resolution needed.</p></div>
-      <div class="gov-card reveal reveal-delay-4"><div class="gov-icon">🏛</div><h4>Authoritative Sources</h4><p>Companies House for enrichment. Registration numbers for identification. Content-driven extraction resilient to layout changes.</p></div>
-    </div>
-  </div>
-</section>
+
 
 <section class="slide" id="users">
   <div class="slide-inner">
@@ -901,7 +870,7 @@ nav.scrolled {
       <span class="pill">Excel & CSV Exports</span>
       <span class="pill">Companies House Enrichment</span>
     </div>
-    <div class="closing-brand reveal reveal-delay-4"><span>LEYTON</span> Data Factory</div>
+    <div class="closing-brand reveal reveal-delay-4"><span>LEYTON</span> UK — Business Intelligence</div>
   </div>
 </section>
 
