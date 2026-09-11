@@ -2,6 +2,9 @@ Power BI analysis designed to assess whether CRM contacts are complete, reachabl
 
 <img width="1592" height="894" alt="image" src="https://github.com/user-attachments/assets/bbf9eef4-7260-44eb-9812-bf6c36aacfd3" />
 
+<img width="1589" height="891" alt="image" src="https://github.com/user-attachments/assets/1edda7ed-7736-42ae-ae9b-fd1b0e744bf5" />
+
+<img width="1590" height="893" alt="image" src="https://github.com/user-attachments/assets/9a0aeb48-b4df-407d-bd52-2b2536dbeeff" />
 
 ## Business Problem
 
